@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FBCS Portal - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo-section">
+                <div class="logo-icon">F</div>
+                <div class="logo-text">FBCS Portal</div>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="login.html" class="active">Log In</a>
+                <a href="register.html">Sign Up</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main style="display: flex; align-items: center; justify-content: center;">
+        <div class="auth-container glass-card">
+            <div class="auth-header">
+                <h2>Welcome Back</h2>
+                <p>Log in with your credentials to access surveys.</p>
+            </div>
+
+            <!-- Error/Success alerts holder -->
+            <div id="alert-box" style="display: none;"></div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="name@university.edu" required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>New to the portal? <a href="register.html">Create an account</a></p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Feedback Collection System (FBCS). All rights reserved. Developed in partnership with Wheeltrix.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

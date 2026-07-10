@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FBCS Portal - Register</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo-section">
+                <div class="logo-icon">F</div>
+                <div class="logo-text">FBCS Portal</div>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="login.html">Log In</a>
+                <a href="register.html" class="active">Sign Up</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main style="display: flex; align-items: center; justify-content: center;">
+        <div class="auth-container glass-card" style="max-width: 520px;">
+            <div class="auth-header">
+                <h2>Create Account</h2>
+                <p>Register as a student or employee to begin submitting feedback.</p>
+            </div>
+
+            <!-- Error/Success alerts holder -->
+            <div id="alert-box" style="display: none;"></div>
+
+            <!-- Register Form -->
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="Alice Smith" required autocomplete="name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="alice@university.edu" required autocomplete="email">
+                </div>
+
+                <!-- Subgroup Select -->
+                <div class="form-group">
+                    <label for="subgroup" class="form-label">Subgroup / Department</label>
+                    <select id="subgroup" class="form-control" style="background-color: var(--bg-secondary); color: var(--text-main); border: 1px solid var(--border-color);" required>
+                        <option value="" disabled selected>Select your subgroup</option>
+                        <option value="CSE-A">CSE - Section A</option>
+                        <option value="CSE-B">CSE - Section B</option>
+                        <option value="ECE-A">ECE - Section A</option>
+                        <option value="MECH">Mechanical Engineering</option>
+                        <option value="HR">Human Resources</option>
+                        <option value="ACADEMICS">Academic Department</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="At least 8 characters" required autocomplete="new-password" minlength="8">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password" class="form-label">Confirm Password</label>
+                    <input type="password" id="confirm-password" class="form-control" placeholder="Repeat your password" required autocomplete="new-password">
+                </div>
+
+                <button type="submit" class="btn btn-accent" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
+                    Register Account
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already registered? <a href="login.html">Sign in here</a></p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Feedback Collection System (FBCS). All rights reserved. Developed in partnership with Wheeltrix.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>
