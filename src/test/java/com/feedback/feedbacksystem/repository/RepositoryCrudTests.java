@@ -1,9 +1,8 @@
 package com.feedback.feedbacksystem.repository;
 
-import com.feedback.feedbacksystem.model.Department;
-import com.feedback.feedbacksystem.model.Role;
-import com.feedback.feedbacksystem.model.User;
+import com.feedback.feedbacksystem.model.*;
 import org.junit.jupiter.api.Test;
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +24,12 @@ class RepositoryCrudTests {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
+
+    @Autowired
+    private CourseAssignmentRepository courseAssignmentRepository;
 
     @Test
     void testDepartmentCrudOperations() {
@@ -137,5 +142,87 @@ class RepositoryCrudTests {
         userRepository.delete(updatedUser);
         Optional<User> deletedUser = userRepository.findByEmail("testuser@college.edu");
         assertThat(deletedUser).isEmpty();
+    }
+
+    @Test
+    void testCourseAndCourseAssignmentCrud() {
+        // 1. Setup Department & Course
+        Department dept = departmentRepository.findByCode("CSE")
+                .orElseGet(() -> departmentRepository.save(
+                        Department.builder().name("Computer Science").code("CSE").build()
+                ));
+
+        Course course = Course.builder()
+                .name("Software Engineering")
+                .code("CSE-301")
+                .department(dept)
+                .active(true)
+                .build();
+        Course savedCourse = courseRepository.save(course);
+        assertThat(savedCourse.getId()).isNotNull();
+        assertThat(savedCourse.getName()).isEqualTo("Software Engineering");
+
+        // Test Finders for Course
+        Optional<Course> foundCourse = courseRepository.findByCode("CSE-301");
+        assertThat(foundCourse).isPresent();
+        assertThat(courseRepository.existsByCode("CSE-301")).isTrue();
+        assertThat(courseRepository.findByDepartmentId(dept.getId())).contains(savedCourse);
+
+        // 2. Setup User & Faculty Profile for assignment
+        Role role = roleRepository.findByName("ROLE_FACULTY")
+                .orElseGet(() -> roleRepository.save(
+                        Role.builder().name("ROLE_FACULTY").build()
+                ));
+
+        User user = User.builder()
+                .name("Dr. Smith")
+                .email("smith@college.edu")
+                .password("password123")
+                .department(dept)
+                .role(role)
+                .active(true)
+                .build();
+
+        FacultyProfile facultyProfile = FacultyProfile.builder()
+                .user(user)
+                .employeeId("EMP101")
+                .designation("Associate Professor")
+                .joiningDate(LocalDate.of(2020, 8, 15))
+                .build();
+        user.setFacultyProfile(facultyProfile);
+
+        User savedUser = userRepository.save(user);
+        FacultyProfile savedFaculty = savedUser.getFacultyProfile();
+        assertThat(savedFaculty.getId()).isNotNull();
+
+        // 3. Create CourseAssignment
+        CourseAssignment assignment = CourseAssignment.builder()
+                .course(savedCourse)
+                .faculty(savedUser)
+                .academicYear("2025-2026")
+                .semester(5)
+                .section("A")
+                .status("ACTIVE")
+                .build();
+        CourseAssignment savedAssignment = courseAssignmentRepository.save(assignment);
+        assertThat(savedAssignment.getId()).isNotNull();
+
+        // Test Finders for CourseAssignment
+        assertThat(courseAssignmentRepository.findByCourseId(savedCourse.getId())).contains(savedAssignment);
+        assertThat(courseAssignmentRepository.findByFacultyId(savedUser.getId())).contains(savedAssignment);
+        assertThat(courseAssignmentRepository.findByAcademicYearAndSemesterAndSection("2025-2026", 5, "A")).contains(savedAssignment);
+
+        // Update Assignment
+        savedAssignment.setStatus("INACTIVE");
+        CourseAssignment updatedAssignment = courseAssignmentRepository.save(savedAssignment);
+        assertThat(updatedAssignment.getStatus()).isEqualTo("INACTIVE");
+
+        // Delete Assignment
+        courseAssignmentRepository.delete(updatedAssignment);
+        assertThat(courseAssignmentRepository.findById(savedAssignment.getId())).isEmpty();
+
+        // Delete Course
+        courseRepository.delete(savedCourse);
+        assertThat(courseRepository.findByCode("CSE-301")).isEmpty();
     }
 }
