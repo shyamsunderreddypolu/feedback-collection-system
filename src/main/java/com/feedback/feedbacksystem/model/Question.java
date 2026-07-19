@@ -1,6 +1,7 @@
 package com.feedback.feedbacksystem.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -22,13 +23,16 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feedback_form_id", nullable = false)
     private FeedbackForm feedbackForm;
 
+    @NotBlank
     @Column(name = "question_text", nullable = false, columnDefinition = "TEXT")
     private String questionText;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "question_type", nullable = false)
     private QuestionType questionType;
@@ -37,6 +41,7 @@ public class Question {
     @Builder.Default
     private boolean isMandatory = false;
 
+    @Min(1)
     @Column(name = "display_order", nullable = false)
     private int displayOrder;
 
