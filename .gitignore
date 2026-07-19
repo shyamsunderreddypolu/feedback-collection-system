@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Database & Documentation Guides (Excluded from develop branch) ###
+DATABASE_TEAM_EXPLANATION.md
+DEVELOPER_GUIDE.md
+DEVELOPMENT_GUIDE.md
+FBCS_Complete_Documentation.md
+schema.sql
+drop_schema.sql
+
