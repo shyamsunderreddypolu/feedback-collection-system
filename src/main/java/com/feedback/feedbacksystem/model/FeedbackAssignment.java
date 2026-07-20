@@ -34,10 +34,10 @@ public class FeedbackAssignment {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
-    // Plain FK column until the Course entity is delivered (issue #4);
     // NULL targets a general department-wide survey instead of a course.
-    @Column(name = "course_id")
-    private Long courseId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id")
+    private Course course;
 
     @Min(1)
     @Max(8)
