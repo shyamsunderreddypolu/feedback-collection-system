@@ -135,8 +135,8 @@ CREATE TABLE IF NOT EXISTS `faculty_profiles` (
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS `courses` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(150) NOT NULL,
-  `code` VARCHAR(30) NOT NULL UNIQUE, -- E.g. 'CS101'
+  `name` VARCHAR(100) NOT NULL,
+  `code` VARCHAR(20) NOT NULL UNIQUE, -- E.g. 'CS101'
   `department_id` BIGINT NOT NULL,
   `active` BOOLEAN NOT NULL DEFAULT TRUE,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

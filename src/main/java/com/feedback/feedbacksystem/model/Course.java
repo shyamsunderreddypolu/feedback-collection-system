@@ -23,13 +23,13 @@ public class Course {
     private Long id;
 
     @NotBlank
-    @Size(max = 150)
-    @Column(nullable = false, length = 150)
+    @Size(max = 100)
+    @Column(nullable = false, length = 100)
     private String name;
 
     @NotBlank
-    @Size(max = 30)
-    @Column(nullable = false, unique = true, length = 30)
+    @Size(max = 20)
+    @Column(nullable = false, unique = true, length = 20)
     private String code;
 
     @ManyToOne(fetch = FetchType.LAZY)
