@@ -12,9 +12,9 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Optional<Course> findByCode(String code);
 
+    boolean existsByCode(String code);
+
     List<Course> findByDepartmentId(Long departmentId);
 
     List<Course> findByActiveTrue();
-
-    boolean existsByCode(String code);
 }

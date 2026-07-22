@@ -1,6 +1,8 @@
 package com.feedback.feedbacksystem.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,9 +22,13 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 150)
     @Column(nullable = false, length = 150)
     private String name;
 
+    @NotBlank
+    @Size(max = 30)
     @Column(nullable = false, unique = true, length = 30)
     private String code;
 
