@@ -438,7 +438,7 @@ INSERT INTO `faculty_profiles` (`id`, `user_id`, `employee_id`, `designation`, `
   (1, 2, 'EMP-CSE-201', 'Professor', '2020-06-15')
   ON DUPLICATE KEY UPDATE `employee_id`=`employee_id`;
 
--- Student User: password hash maps to plaintext: 'student123'
+-- Student User (dev-only): do not store or document default passwords in source control
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `department_id`, `role_id`) VALUES
   (3, 'Abhishek Sharma', 'student@college.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qOu5AycPZ9bU7u525fOBd56b0266V2g3S2', 1, 1)
   ON DUPLICATE KEY UPDATE `email`=`email`;
