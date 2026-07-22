@@ -429,7 +429,7 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `department_id`, `role_i
   (1, 'System Administrator', 'admin@college.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qOu5AycPZ9bU7u525fOBd56b0266V2g3S2', NULL, 3)
   ON DUPLICATE KEY UPDATE `email`=`email`;
 
--- Faculty User: password hash maps to plaintext: 'faculty123'
+-- Faculty User (dev-only): do not store or document default passwords in source control
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `department_id`, `role_id`) VALUES
   (2, 'Dr. Raj Kumar', 'faculty@college.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qOu5AycPZ9bU7u525fOBd56b0266V2g3S2', 1, 2)
   ON DUPLICATE KEY UPDATE `email`=`email`;
