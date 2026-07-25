@@ -10,7 +10,7 @@ Every team member needs to set up the database locally before coding:
      1. First run **`drop_schema.sql`** (to clean up old tables).
      2. Then run **`schema.sql`** (to build the tables, keys, and seed the default roles/departments).
 3. **Spring Boot database connections**:
-   * The database username is set to `fbcs_user` and password is `Fbcspassword_2026`. (If they use different local passwords, they must edit their `src/main/resources/application.properties` profile).
+   * Configure DB credentials via environment variables (e.g. `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD`) or your local `application-*.properties` (do not commit passwords).
 
 ---
 

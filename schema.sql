@@ -135,8 +135,8 @@ CREATE TABLE IF NOT EXISTS `faculty_profiles` (
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS `courses` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(150) NOT NULL,
-  `code` VARCHAR(30) NOT NULL UNIQUE, -- E.g. 'CS101'
+  `name` VARCHAR(100) NOT NULL,
+  `code` VARCHAR(20) NOT NULL UNIQUE, -- E.g. 'CS101'
   `department_id` BIGINT NOT NULL,
   `active` BOOLEAN NOT NULL DEFAULT TRUE,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -424,12 +424,12 @@ INSERT INTO `departments` (`id`, `name`, `code`) VALUES
   (3, 'Electronics & Communication Engineering', 'ECE')
   ON DUPLICATE KEY UPDATE `code`=`code`;
 
--- Admin User: password hash maps to plaintext: 'admin123'
+-- Admin User (dev-only): do not store or document default passwords in source control
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `department_id`, `role_id`) VALUES
   (1, 'System Administrator', 'admin@college.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qOu5AycPZ9bU7u525fOBd56b0266V2g3S2', NULL, 3)
   ON DUPLICATE KEY UPDATE `email`=`email`;
 
--- Faculty User: password hash maps to plaintext: 'faculty123'
+-- Faculty User (dev-only): do not store or document default passwords in source control
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `department_id`, `role_id`) VALUES
   (2, 'Dr. Raj Kumar', 'faculty@college.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qOu5AycPZ9bU7u525fOBd56b0266V2g3S2', 1, 2)
   ON DUPLICATE KEY UPDATE `email`=`email`;
@@ -438,7 +438,7 @@ INSERT INTO `faculty_profiles` (`id`, `user_id`, `employee_id`, `designation`, `
   (1, 2, 'EMP-CSE-201', 'Professor', '2020-06-15')
   ON DUPLICATE KEY UPDATE `employee_id`=`employee_id`;
 
--- Student User: password hash maps to plaintext: 'student123'
+-- Student User (dev-only): do not store or document default passwords in source control
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `department_id`, `role_id`) VALUES
   (3, 'Abhishek Sharma', 'student@college.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qOu5AycPZ9bU7u525fOBd56b0266V2g3S2', 1, 1)
   ON DUPLICATE KEY UPDATE `email`=`email`;
