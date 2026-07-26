@@ -12,8 +12,7 @@ import java.util.List;
 @Repository
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
-    @Query("SELECT a FROM AuditLog a WHERE a.performedBy.id = :userId")
-    List<AuditLog> findByPerformedBy(@Param("userId") Long userId);
+   List<AuditLog> findByPerformedById(Long userId);
 
     List<AuditLog> findByEntityNameAndEntityId(String entityName, Long entityId);
 
