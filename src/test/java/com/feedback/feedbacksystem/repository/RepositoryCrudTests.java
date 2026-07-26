@@ -3,8 +3,10 @@ package com.feedback.feedbacksystem.repository;
 import com.feedback.feedbacksystem.model.*;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -14,6 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional // Automatically rolls back database modifications after each test execution
+@TestPropertySource(properties = {
+    "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL",
+    "spring.datasource.driverClassName=org.h2.Driver",
+    "spring.datasource.username=sa",
+    "spring.datasource.password=",
+    "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
+    "spring.jpa.hibernate.ddl-auto=create-drop"
+})
 class RepositoryCrudTests {
 
     @Autowired
@@ -30,6 +40,12 @@ class RepositoryCrudTests {
 
     @Autowired
     private CourseAssignmentRepository courseAssignmentRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
+    private AuditLogRepository auditLogRepository;
 
     @Test
     void testDepartmentCrudOperations() {
@@ -224,5 +240,96 @@ class RepositoryCrudTests {
         // Delete Course
         courseRepository.delete(savedCourse);
         assertThat(courseRepository.findByCode("CSE-301")).isEmpty();
+    }
+
+    @Test
+    void testNotificationCrudAndFinderMethods() {
+        Role role = roleRepository.findByName("ROLE_STUDENT")
+                .orElseGet(() -> roleRepository.save(Role.builder().name("ROLE_STUDENT").build()));
+
+        User user = userRepository.save(User.builder()
+                .name("Notification Test User")
+                .email("notifuser@college.edu")
+                .password("password123")
+                .role(role)
+                .active(true)
+                .build());
+
+        Notification notif1 = notificationRepository.save(Notification.builder()
+                .user(user)
+                .title("Alert 1")
+                .message("Test message 1")
+                .notificationType(NotificationType.SYSTEM_ALERT)
+                .priority(NotificationPriority.HIGH)
+                .isRead(false)
+                .build());
+
+        Notification notif2 = notificationRepository.save(Notification.builder()
+                .user(user)
+                .title("Alert 2")
+                .message("Test message 2")
+                .notificationType(NotificationType.SURVEY_ASSIGNED)
+                .priority(NotificationPriority.MEDIUM)
+                .isRead(true)
+                .build());
+
+        // Test findByUserIdOrderByCreatedAtDesc
+        List<Notification> allNotifs = notificationRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
+        assertThat(allNotifs).hasSize(2);
+
+        // Test findByUserIdAndIsReadFalse
+        List<Notification> unreadNotifs = notificationRepository.findByUserIdAndIsReadFalse(user.getId());
+        assertThat(unreadNotifs).hasSize(1);
+        assertThat(unreadNotifs.get(0).getTitle()).isEqualTo("Alert 1");
+
+        // Test countByUserIdAndIsReadFalse
+        long unreadCount = notificationRepository.countByUserIdAndIsReadFalse(user.getId());
+        assertThat(unreadCount).isEqualTo(1L);
+    }
+
+    @Test
+    void testAuditLogCrudAndFinderMethods() {
+        Role role = roleRepository.findByName("ROLE_ADMIN")
+                .orElseGet(() -> roleRepository.save(Role.builder().name("ROLE_ADMIN").build()));
+
+        User user = userRepository.save(User.builder()
+                .name("Audit Admin")
+                .email("auditadmin@college.edu")
+                .password("password123")
+                .role(role)
+                .active(true)
+                .build());
+
+        LocalDateTime start = LocalDateTime.now().minusHours(1);
+
+        AuditLog log1 = auditLogRepository.save(AuditLog.builder()
+                .action("CREATE_USER")
+                .entityName("User")
+                .entityId(100L)
+                .performedBy(user)
+                .details("Created user 100")
+                .build());
+
+        AuditLog log2 = auditLogRepository.save(AuditLog.builder()
+                .action("UPDATE_USER")
+                .entityName("User")
+                .entityId(100L)
+                .performedBy(user)
+                .details("Updated user 100")
+                .build());
+
+        LocalDateTime end = LocalDateTime.now().plusHours(1);
+
+        // Test findByPerformedBy
+        List<AuditLog> userLogs = auditLogRepository.findByPerformedBy(user.getId());
+        assertThat(userLogs).hasSize(2);
+
+        // Test findByEntityNameAndEntityId
+        List<AuditLog> entityLogs = auditLogRepository.findByEntityNameAndEntityId("User", 100L);
+        assertThat(entityLogs).hasSize(2);
+
+        // Test findByPerformedAtBetween
+        List<AuditLog> rangeLogs = auditLogRepository.findByPerformedAtBetween(start, end);
+        assertThat(rangeLogs).contains(log1, log2);
     }
 }
