@@ -218,7 +218,7 @@ class RepositoryCrudTests {
                 .academicYear("2025-2026")
                 .semester(5)
                 .section("A")
-                .status("ACTIVE")
+                .status(AssignmentStatus.ACTIVE)
                 .build();
         CourseAssignment savedAssignment = courseAssignmentRepository.save(assignment);
         assertThat(savedAssignment.getId()).isNotNull();
