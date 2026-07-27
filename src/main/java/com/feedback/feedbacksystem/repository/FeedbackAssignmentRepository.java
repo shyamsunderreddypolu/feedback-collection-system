@@ -11,6 +11,8 @@ public interface FeedbackAssignmentRepository extends JpaRepository<FeedbackAssi
 
     List<FeedbackAssignment> findByFeedbackFormId(Long feedbackFormId);
 
+    long countByFeedbackFormId(Long feedbackFormId);
+
     List<FeedbackAssignment> findByDepartmentIdAndSemesterAndSectionAndBatch(
             Long deptId, int sem, String sec, String batch);
 }
