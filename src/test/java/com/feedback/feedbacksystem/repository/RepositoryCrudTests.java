@@ -320,8 +320,8 @@ class RepositoryCrudTests {
 
         LocalDateTime end = LocalDateTime.now().plusHours(1);
 
-        // Test findByPerformedBy
-        List<AuditLog> userLogs = auditLogRepository.findByPerformedBy(user.getId());
+        // Test findByPerformedById
+        List<AuditLog> userLogs = auditLogRepository.findByPerformedById(user.getId());
         assertThat(userLogs).hasSize(2);
 
         // Test findByEntityNameAndEntityId
