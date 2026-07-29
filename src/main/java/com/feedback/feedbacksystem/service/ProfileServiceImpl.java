@@ -47,7 +47,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .orElseGet(() -> StudentProfile.builder().user(user).build());
 
         if (dto.getRollNumber() != null) profile.setRollNumber(dto.getRollNumber().trim());
-        if (dto.getAcademicYear() != null) profile.setAcademicYear(dto.getAcademicYear().trim());
+        if (dto.getYear() > 0) profile.setYear(dto.getYear());
         if (dto.getSemester() > 0) profile.setSemester(dto.getSemester());
         if (dto.getSection() != null) profile.setSection(dto.getSection().trim());
         if (dto.getBatch() != null) profile.setBatch(dto.getBatch().trim());
@@ -77,7 +77,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .id(profile.getId())
                 .userId(profile.getUser() != null ? profile.getUser().getId() : null)
                 .rollNumber(profile.getRollNumber())
-                .academicYear(profile.getAcademicYear())
+                .year(profile.getYear())
                 .semester(profile.getSemester())
                 .section(profile.getSection())
                 .batch(profile.getBatch())

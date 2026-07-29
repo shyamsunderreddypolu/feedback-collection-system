@@ -11,7 +11,7 @@ public class StudentProfileDto {
     private Long id;
     private Long userId;
     private String rollNumber;
-    private String academicYear;
+    private int year;
     private int semester;
     private String section;
     private String batch;

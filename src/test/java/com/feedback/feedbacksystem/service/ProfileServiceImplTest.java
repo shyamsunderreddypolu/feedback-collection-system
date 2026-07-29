@@ -51,7 +51,7 @@ class ProfileServiceImplTest {
                 .id(100L)
                 .user(testUser)
                 .rollNumber("21CS001")
-                .academicYear("2025-2026")
+                .year(3)
                 .semester(5)
                 .section("A")
                 .batch("2021-2025")
@@ -74,6 +74,7 @@ class ProfileServiceImplTest {
 
         assertThat(dto).isNotNull();
         assertThat(dto.getRollNumber()).isEqualTo("21CS001");
+        assertThat(dto.getYear()).isEqualTo(3);
         assertThat(dto.getSemester()).isEqualTo(5);
     }
 
@@ -92,6 +93,7 @@ class ProfileServiceImplTest {
     void updateStudentProfileUpdatesAndSaves() {
         StudentProfileDto updateDto = StudentProfileDto.builder()
                 .rollNumber("21CS002")
+                .year(3)
                 .semester(6)
                 .section("B")
                 .build();
