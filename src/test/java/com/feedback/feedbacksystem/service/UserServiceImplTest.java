@@ -35,7 +35,7 @@ class UserServiceImplTest {
     @BeforeEach
     void setUp() {
         Department dept = Department.builder().id(1L).name("Computer Science").code("CSE").build();
-        Role role = Role.builder().id(1L).name("ROLE_STUDENT").build();
+        Role role = Role.builder().id(1).name("ROLE_STUDENT").build();
 
         testUser = User.builder()
                 .id(10L)
