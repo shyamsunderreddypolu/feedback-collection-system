@@ -1,5 +1,6 @@
 package com.feedback.feedbacksystem.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import lombok.*;
 public class CreateFeedbackAssignmentDto {
 
     @NotNull
+    @JsonProperty("formId")
     private Long feedbackFormId;
 
     @NotNull
