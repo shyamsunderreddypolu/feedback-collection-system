@@ -18,4 +18,6 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     List<AuditLog> findByEntityNameAndEntityId(String entityName, Long entityId);
 
     List<AuditLog> findByPerformedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    List<AuditLog> findByPerformedByIdOrderByPerformedAtDesc(Long performedBy);
 }
