@@ -8,15 +8,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
  * Question and option endpoints for the survey builder.
- *
- * <p>Questions belong to a form and may only be added while that form is still a draft;
- * both rules live in {@link QuestionService} rather than here.
  */
 @RestController
 @RequestMapping("/api/questions")
@@ -26,6 +24,7 @@ public class QuestionController {
     private final QuestionService questionService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiMessageResponse> addQuestion(
             @Valid @RequestBody CreateQuestionRequestDto request) {
 
