@@ -218,7 +218,7 @@ class RepositoryCrudTests {
                 .academicYear("2025-2026")
                 .semester(5)
                 .section("A")
-                .status("ACTIVE")
+                .status(AssignmentStatus.ACTIVE)
                 .build();
         CourseAssignment savedAssignment = courseAssignmentRepository.save(assignment);
         assertThat(savedAssignment.getId()).isNotNull();
@@ -229,9 +229,9 @@ class RepositoryCrudTests {
         assertThat(courseAssignmentRepository.findByAcademicYearAndSemesterAndSection("2025-2026", 5, "A")).contains(savedAssignment);
 
         // Update Assignment
-        savedAssignment.setStatus("INACTIVE");
+        savedAssignment.setStatus(AssignmentStatus.CANCELLED);
         CourseAssignment updatedAssignment = courseAssignmentRepository.save(savedAssignment);
-        assertThat(updatedAssignment.getStatus()).isEqualTo("INACTIVE");
+        assertThat(updatedAssignment.getStatus()).isEqualTo(AssignmentStatus.CANCELLED);
 
         // Delete Assignment
         courseAssignmentRepository.delete(updatedAssignment);

@@ -14,7 +14,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     List<Answer> findByQuestionId(Long questionId);
 
     long countByQuestionIdAndSelectedOptionId(Long questionId, Long selectedOptionId);
-
     List<Answer> findByQuestionIdAndRatingValueIsNotNull(Long questionId);
 
     @org.springframework.data.jpa.repository.Query("SELECT AVG(a.ratingValue) FROM Answer a WHERE a.question.id = :questionId AND a.ratingValue IS NOT NULL")

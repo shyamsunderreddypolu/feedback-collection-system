@@ -10,9 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "course_assignments", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_course_assignment_details", columnNames = {
-        "course_id", "faculty_id", "academic_year", "semester", "section"
-    })
+    @UniqueConstraint(name = "uk_course_assignment", columnNames = {"course_id", "faculty_id", "academic_year", "semester", "section"})
 })
 @Getter
 @Setter
@@ -50,11 +48,10 @@ public class CourseAssignment {
     @Column(nullable = false, length = 10)
     private String section;
 
-    @NotBlank
-    @Size(max = 20)
-    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     @Builder.Default
-    private String status = "ACTIVE";
+    private AssignmentStatus status = AssignmentStatus.ACTIVE;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
