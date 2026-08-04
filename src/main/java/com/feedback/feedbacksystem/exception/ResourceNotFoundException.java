@@ -1,15 +1,12 @@
 package com.feedback.feedbacksystem.exception;
 
-/**
- * Thrown when a referenced record does not exist (or has been soft deleted).
- */
 public class ResourceNotFoundException extends RuntimeException {
 
     public ResourceNotFoundException(String message) {
         super(message);
     }
 
-    public ResourceNotFoundException(String resourceName, Object id) {
-        super(resourceName + " not found with id: " + id);
+    public ResourceNotFoundException(String resourceName, Object fieldValue) {
+        super(String.format("%s not found with id: %s", resourceName, fieldValue));
     }
 }
