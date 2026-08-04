@@ -9,14 +9,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/api/feedback-submissions")
+@RequestMapping("/api/submissions")
 @RequiredArgsConstructor
 public class FeedbackSubmissionController {
 
     private final FeedbackSubmissionService feedbackSubmissionService;
 
-    @PostMapping("/submit")
+    @PostMapping
     public ResponseEntity<FeedbackSubmissionResponseDto> submitFeedback(
             @Valid @RequestBody SubmitFeedbackResponseDto request,
             @RequestParam Long submitterId) {
@@ -24,9 +27,17 @@ public class FeedbackSubmissionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/check")
-    public ResponseEntity<Boolean> hasStudentSubmitted(@RequestParam Long formId, @RequestParam Long studentId) {
-        boolean submitted = feedbackSubmissionService.hasStudentSubmitted(formId, studentId);
-        return ResponseEntity.ok(submitted);
+    @GetMapping("/assignment/{assignmentId}/status")
+    public ResponseEntity<Map<String, Object>> checkAssignmentSubmissionStatus(
+            @PathVariable Long assignmentId,
+            @RequestParam Long studentId) {
+        boolean submitted = feedbackSubmissionService.hasStudentSubmittedForAssignment(assignmentId, studentId);
+        return ResponseEntity.ok(Map.of("submitted", submitted, "assignmentId", assignmentId, "studentId", studentId));
+    }
+
+    @GetMapping("/my-history")
+    public ResponseEntity<List<FeedbackSubmissionResponseDto>> getStudentHistory(@RequestParam Long studentId) {
+        List<FeedbackSubmissionResponseDto> history = feedbackSubmissionService.getStudentSubmissionHistory(studentId);
+        return ResponseEntity.ok(history);
     }
 }

@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,6 +26,8 @@ public class FeedbackSubmissionServiceImpl implements FeedbackSubmissionService 
     private final ResponseRepository responseRepository;
     private final AnswerRepository answerRepository;
     private final UserRepository userRepository;
+    private final FeedbackAssignmentRepository feedbackAssignmentRepository;
+    private final CourseAssignmentRepository courseAssignmentRepository;
 
     @Override
     public FeedbackSubmissionResponseDto submitFeedback(SubmitFeedbackResponseDto request, Long submitterId) {
@@ -54,7 +55,6 @@ public class FeedbackSubmissionServiceImpl implements FeedbackSubmissionService 
                         .collect(Collectors.toMap(SubmitAnswerDto::getQuestionId, Function.identity(), (existing, replacement) -> replacement))
                 : Map.of();
 
-        // Validate mandatory questions and answer column format
         for (Question question : questions) {
             SubmitAnswerDto answerDto = answerMap.get(question.getId());
             boolean isAnswered = answerDto != null && (
@@ -104,20 +104,53 @@ public class FeedbackSubmissionServiceImpl implements FeedbackSubmissionService 
             }
         }
 
-        return FeedbackSubmissionResponseDto.builder()
-                .responseId(savedResponse.getId())
-                .feedbackFormId(form.getId())
-                .formTitle(form.getTitle())
-                .submitterName(submitter.getName())
-                .submittedAt(savedResponse.getSubmittedAt())
-                .totalAnswersCount(answersCount)
-                .build();
+        return mapToResponseDto(savedResponse, answersCount);
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean hasStudentSubmitted(Long formId, Long studentId) {
         return responseRepository.existsByFeedbackFormIdAndSubmitterId(formId, studentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasStudentSubmittedForAssignment(Long assignmentId, Long studentId) {
+        Long formId = feedbackAssignmentRepository.findById(assignmentId)
+                .map(fa -> fa.getFeedbackForm().getId())
+                .orElseGet(() -> courseAssignmentRepository.findById(assignmentId)
+                        .flatMap(ca -> feedbackAssignmentRepository.findByCourseId(ca.getCourse().getId()).stream().findFirst())
+                        .map(fa -> fa.getFeedbackForm().getId())
+                        .orElse(assignmentId));
+
+        return responseRepository.existsByFeedbackFormIdAndSubmitterId(formId, studentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FeedbackSubmissionResponseDto> getStudentSubmissionHistory(Long studentId) {
+        if (!userRepository.existsById(studentId)) {
+            throw new IllegalArgumentException("Student not found with id: " + studentId);
+        }
+
+        List<Response> responses = responseRepository.findBySubmitterId(studentId);
+        return responses.stream()
+                .map(r -> {
+                    int answerCount = answerRepository.findByResponseId(r.getId()).size();
+                    return mapToResponseDto(r, answerCount);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private FeedbackSubmissionResponseDto mapToResponseDto(Response response, int answersCount) {
+        return FeedbackSubmissionResponseDto.builder()
+                .responseId(response.getId())
+                .feedbackFormId(response.getFeedbackForm() != null ? response.getFeedbackForm().getId() : null)
+                .formTitle(response.getFeedbackForm() != null ? response.getFeedbackForm().getTitle() : null)
+                .submitterName(response.getSubmitter() != null ? response.getSubmitter().getName() : null)
+                .submittedAt(response.getSubmittedAt())
+                .totalAnswersCount(answersCount)
+                .build();
     }
 
     private void validateAnswerValueType(Question question, SubmitAnswerDto answerDto) {

@@ -1,8 +1,6 @@
 package com.feedback.feedbacksystem.service.impl;
 
-import com.feedback.feedbacksystem.dto.CourseAnalyticsDto;
-import com.feedback.feedbacksystem.dto.FormAnalyticsSummaryDto;
-import com.feedback.feedbacksystem.dto.QuestionRatingSummaryDto;
+import com.feedback.feedbacksystem.dto.*;
 import com.feedback.feedbacksystem.model.*;
 import com.feedback.feedbacksystem.repository.*;
 import com.feedback.feedbacksystem.service.AnalyticsService;
@@ -29,6 +27,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final QuestionRepository questionRepository;
     private final FeedbackAssignmentRepository feedbackAssignmentRepository;
     private final StudentProfileRepository studentProfileRepository;
+    private final UserRepository userRepository;
+    private final CourseAssignmentRepository courseAssignmentRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Override
     public FormAnalyticsSummaryDto getFormAnalytics(Long formId) {
@@ -101,7 +102,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 formSummaries.add(formSummary);
                 totalResponsesAcrossForms += formSummary.getTotalResponses();
             } catch (Exception ignored) {
-                // Skip deleted or invalid forms if any
             }
         }
 
@@ -119,6 +119,107 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .totalResponses(totalResponsesAcrossForms)
                 .averageCourseRating(averageCourseRating)
                 .formSummaries(formSummaries)
+                .build();
+    }
+
+    @Override
+    public FacultyAnalyticsDto getFacultyAnalytics(Long facultyId) {
+        User faculty = userRepository.findById(facultyId)
+                .orElseThrow(() -> new IllegalArgumentException("Faculty user not found with id: " + facultyId));
+
+        List<CourseAssignment> assignments = courseAssignmentRepository.findByFacultyId(facultyId);
+
+        List<Long> courseIds = assignments.stream()
+                .map(CourseAssignment::getCourse)
+                .filter(Objects::nonNull)
+                .map(Course::getId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<CourseAnalyticsDto> courseSummaries = new ArrayList<>();
+        long totalResponsesReceived = 0;
+
+        for (Long courseId : courseIds) {
+            try {
+                CourseAnalyticsDto courseAnalytics = getCourseAnalytics(courseId);
+                courseSummaries.add(courseAnalytics);
+                totalResponsesReceived += courseAnalytics.getTotalResponses();
+            } catch (Exception ignored) {
+            }
+        }
+
+        Double overallRating = null;
+        if (!courseSummaries.isEmpty()) {
+            double sumRatings = 0.0;
+            int countRatings = 0;
+            for (CourseAnalyticsDto dto : courseSummaries) {
+                if (dto.getAverageCourseRating() != null) {
+                    sumRatings += dto.getAverageCourseRating();
+                    countRatings++;
+                }
+            }
+            if (countRatings > 0) {
+                overallRating = roundToTwoDecimals(sumRatings / countRatings);
+            }
+        }
+
+        String employeeId = faculty.getFacultyProfile() != null ? faculty.getFacultyProfile().getEmployeeId() : null;
+        String designation = faculty.getFacultyProfile() != null ? faculty.getFacultyProfile().getDesignation() : null;
+
+        return FacultyAnalyticsDto.builder()
+                .facultyId(faculty.getId())
+                .facultyName(faculty.getName())
+                .employeeId(employeeId)
+                .designation(designation)
+                .totalCoursesTaught((long) courseSummaries.size())
+                .totalResponsesReceived(totalResponsesReceived)
+                .overallAverageRating(overallRating)
+                .courseSummaries(courseSummaries)
+                .build();
+    }
+
+    @Override
+    public AdminSummaryAnalyticsDto getAdminSummaryAnalytics() {
+        long totalForms = feedbackFormRepository.count();
+        long totalActiveForms = feedbackFormRepository.findByStatusAndIsDeletedFalse(FormStatus.ACTIVE).size();
+        long totalResponses = responseRepository.count();
+        long totalStudents = studentProfileRepository.count();
+
+        Double overallCompletionRate = calculateCompletionRate(totalResponses, totalStudents);
+
+        List<Department> departments = departmentRepository.findAll();
+        List<DepartmentPerformanceDto> deptPerformances = new ArrayList<>();
+
+        for (Department dept : departments) {
+            long deptStudents = studentProfileRepository.findAll().stream()
+                    .filter(sp -> sp.getUser() != null && sp.getUser().getDepartment() != null && sp.getUser().getDepartment().getId().equals(dept.getId()))
+                    .count();
+
+            long deptResponses = responseRepository.findAll().stream()
+                    .filter(r -> r.getSubmitter() != null && r.getSubmitter().getDepartment() != null && r.getSubmitter().getDepartment().getId().equals(dept.getId()))
+                    .count();
+
+            Double deptCompletion = calculateCompletionRate(deptResponses, deptStudents);
+
+            deptPerformances.add(DepartmentPerformanceDto.builder()
+                    .departmentId(dept.getId())
+                    .departmentName(dept.getName())
+                    .departmentCode(dept.getCode())
+                    .totalStudents(deptStudents)
+                    .totalResponses(deptResponses)
+                    .completionRate(deptCompletion)
+                    .averageRating(null)
+                    .build());
+        }
+
+        return AdminSummaryAnalyticsDto.builder()
+                .totalForms(totalForms)
+                .totalActiveForms(totalActiveForms)
+                .totalResponses(totalResponses)
+                .totalStudents(totalStudents)
+                .overallCompletionRate(overallCompletionRate)
+                .overallCollegeRating(null)
+                .departmentPerformanceList(deptPerformances)
                 .build();
     }
 
