@@ -27,7 +27,7 @@ public class StudentProfile {
     @Column(name = "roll_number", nullable = false, unique = true, length = 50)
     private String rollNumber;
 
-    @Column(nullable = false)
+    @Column(name = "`year`", nullable = false)
     private int year;
 
     @Column(nullable = false)
