@@ -27,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -152,22 +153,33 @@ class FeedbackFormServiceImplTest {
     }
 
     @Test
-    @DisplayName("getActiveForms returns ACTIVE forms and drops soft deleted ones")
+    @DisplayName("getActiveForms queries the open response window and drops soft deleted ones")
     void getActiveFormsExcludesDeleted() {
         FeedbackForm live = form(FormStatus.ACTIVE);
         FeedbackForm deleted = form(FormStatus.ACTIVE);
         deleted.setId(2L);
         deleted.setDeleted(true);
-        when(feedbackFormRepository.findByStatus(FormStatus.ACTIVE)).thenReturn(List.of(live, deleted));
+        when(feedbackFormRepository.findByStatusAndStartDateBeforeAndEndDateAfter(
+                eq(FormStatus.ACTIVE), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .thenReturn(List.of(live, deleted));
         when(questionRepository.countByFeedbackFormId(1L)).thenReturn(3L);
         when(feedbackAssignmentRepository.countByFeedbackFormId(1L)).thenReturn(2L);
 
+        LocalDateTime before = LocalDateTime.now();
         List<FeedbackFormResponseDto> active = service.getActiveForms();
 
         assertThat(active).hasSize(1);
         assertThat(active.get(0).getId()).isEqualTo(1L);
         assertThat(active.get(0).getTotalQuestions()).isEqualTo(3L);
         assertThat(active.get(0).getTotalAssignments()).isEqualTo(2L);
+
+        // The window is anchored on the current time rather than left unbounded.
+        ArgumentCaptor<LocalDateTime> startBound = ArgumentCaptor.forClass(LocalDateTime.class);
+        ArgumentCaptor<LocalDateTime> endBound = ArgumentCaptor.forClass(LocalDateTime.class);
+        verify(feedbackFormRepository).findByStatusAndStartDateBeforeAndEndDateAfter(
+                eq(FormStatus.ACTIVE), startBound.capture(), endBound.capture());
+        assertThat(startBound.getValue()).isBetween(before, LocalDateTime.now());
+        assertThat(endBound.getValue()).isEqualTo(startBound.getValue());
     }
 
     @Test

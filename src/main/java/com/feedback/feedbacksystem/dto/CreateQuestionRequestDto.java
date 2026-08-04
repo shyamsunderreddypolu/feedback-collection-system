@@ -1,5 +1,6 @@
 package com.feedback.feedbacksystem.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.feedback.feedbacksystem.model.QuestionType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,6 +16,7 @@ import java.util.List;
 public class CreateQuestionRequestDto {
 
     @NotNull
+    @JsonProperty("formId")
     private Long feedbackFormId;
 
     @NotBlank
@@ -23,7 +25,13 @@ public class CreateQuestionRequestDto {
     @NotNull
     private QuestionType questionType;
 
-    private boolean isMandatory;
+    /**
+     * Named {@code mandatory} rather than {@code isMandatory} so that the field and the
+     * generated {@code isMandatory()} getter resolve to a single Jackson property, which
+     * {@code @JsonProperty} can then expose under the contract name.
+     */
+    @JsonProperty("required")
+    private boolean mandatory;
 
     private int displayOrder;
 
