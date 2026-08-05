@@ -1,0 +1,91 @@
+.settings-page{
+    padding:25px;
+}
+
+.settings-page h1{
+    font-size:34px;
+    color:#222;
+}
+
+.settings-page p{
+    color:#666;
+    margin-bottom:25px;
+}
+
+.settings-card{
+    background:#fff;
+    padding:25px;
+    margin-bottom:25px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.settings-card h2{
+    color:#2563eb;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.settings-card input[type="text"],
+.settings-card input[type="email"],
+.settings-card input[type="password"]{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:15px;
+}
+
+.settings-card label{
+    display:block;
+    margin-bottom:15px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.settings-card input[type="checkbox"],
+.settings-card input[type="radio"]{
+    margin-right:10px;
+}
+
+.save-settings-btn{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:14px 25px;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    transition:.3s;
+}
+
+.save-settings-btn:hover{
+    background:#1d4ed8;
+}
+
+@media(max-width:768px){
+
+.settings-page{
+    padding:15px;
+}
+
+.settings-page h1{
+    font-size:28px;
+}
+
+.settings-card{
+    padding:20px;
+}
+
+.save-settings-btn{
+    width:100%;
+    justify-content:center;
+}
+
+}
