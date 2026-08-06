@@ -45,9 +45,9 @@ public class AuthControllerTest {
         LoginRequestDto request = new LoginRequestDto("admin@test.com", "password123");
         AuthResponseDto response = AuthResponseDto.builder()
                 .token("mock-jwt-token")
-                .id(1L)
+                .userId(1L)
                 .name("Admin User")
-                .userEmail("admin@test.com")
+                .email("admin@test.com")
                 .role("ROLE_ADMIN")
                 .build();
 
@@ -73,9 +73,9 @@ public class AuthControllerTest {
 
         AuthResponseDto response = AuthResponseDto.builder()
                 .token("mock-jwt-token")
-                .id(2L)
+                .userId(2L)
                 .name("New User")
-                .userEmail("new@test.com")
+                .email("new@test.com")
                 .role("ROLE_STUDENT")
                 .build();
 
@@ -86,6 +86,6 @@ public class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.token").value("mock-jwt-token"))
-                .andExpect(jsonPath("$.userEmail").value("new@test.com"));
+                .andExpect(jsonPath("$.email").value("new@test.com"));
     }
 }
