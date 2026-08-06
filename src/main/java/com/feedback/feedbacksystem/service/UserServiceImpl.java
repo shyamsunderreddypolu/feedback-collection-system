@@ -38,6 +38,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getUsersByRole(String roleName) {
+        String formattedRole = roleName.toUpperCase().startsWith("ROLE_") ? roleName.toUpperCase() : "ROLE_" + roleName.toUpperCase();
+        return userRepository.findAll().stream()
+                .filter(user -> user.isActive() && !user.isDeleted())
+                .filter(user -> user.getRole() != null && user.getRole().getName().equalsIgnoreCase(formattedRole))
+                .map(this::toUserResponseDto)
+                .toList();
+    }
+
+    @Override
     public void deactivateUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId));
