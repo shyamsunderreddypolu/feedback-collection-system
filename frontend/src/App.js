@@ -2,7 +2,10 @@ import { Routes, Route } from "react-router-dom";
 
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-import FeedbackDetails from "./pages/FeedbackDetails";
+import StudentDashboard from "./pages/StudentDashboard";
+import TakeSurveyPage from "./pages/TakeSurveyPage";
+import FacultyDashboard from "./pages/FacultyDashboard";
+import FormBuilderStudio from "./pages/FormBuilderStudio";
 import Users from "./pages/Users";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
@@ -11,7 +14,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Routes>
+      {/* Public Login Route */}
       <Route path="/" element={<AdminLogin />} />
+      <Route path="/login" element={<AdminLogin />} />
+
+      {/* Admin Protected Routes */}
       <Route
         path="/dashboard"
         element={
@@ -21,17 +28,17 @@ function App() {
         }
       />
       <Route
-        path="/feedback-details"
+        path="/form-builder"
         element={
-          <ProtectedRoute>
-            <FeedbackDetails />
+          <ProtectedRoute allowedRole="ROLE_ADMIN">
+            <FormBuilderStudio />
           </ProtectedRoute>
         }
       />
       <Route
         path="/users"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRole="ROLE_ADMIN">
             <Users />
           </ProtectedRoute>
         }
@@ -49,6 +56,34 @@ function App() {
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Student Protected Routes */}
+      <Route
+        path="/student-surveys"
+        element={
+          <ProtectedRoute>
+            <StudentDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/take-survey/:formId"
+        element={
+          <ProtectedRoute>
+            <TakeSurveyPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Faculty Protected Routes */}
+      <Route
+        path="/faculty-analytics"
+        element={
+          <ProtectedRoute>
+            <FacultyDashboard />
           </ProtectedRoute>
         }
       />

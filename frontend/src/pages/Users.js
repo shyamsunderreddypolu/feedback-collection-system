@@ -1,283 +1,156 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import API from "../api/axiosInstance";
 import "../css/Users.css";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaTrash, FaUserShield, FaUserGraduate, FaChalkboardTeacher, FaFilter } from "react-icons/fa";
 
 function Users() {
-
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "Mohan",
-      email: "mohan@gmail.com",
-      role: "Admin",
-    },
-    {
-      id: 2,
-      name: "Rahul",
-      email: "rahul@gmail.com",
-      role: "User",
-    },
-    {
-      id: 3,
-      name: "Priya",
-      email: "priya@gmail.com",
-      role: "User",
-    },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("ALL");
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState({ type: "", text: "" });
 
-  const [showModal, setShowModal] = useState(false);
+  useEffect(() => {
+    fetchUsers();
+  }, [roleFilter]);
 
-  const [editingUser, setEditingUser] = useState(null);
-
-  const [newUser, setNewUser] = useState({
-    name: "",
-    email: "",
-    role: "User",
-  });
-
-  const deleteUser = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
-  };
-
-  const editUser = (user) => {
-    setEditingUser(user);
-
-    setNewUser({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    });
-
-    setShowModal(true);
-  };
-
-  const saveUser = () => {
-
-    if (newUser.name === "" || newUser.email === "") {
-      alert("Please Fill All Fields");
-      return;
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const url = roleFilter === "ALL" ? "/users/active" : `/users/role/${roleFilter}`;
+      const response = await API.get(url);
+      setUsers(response.data || []);
+    } catch (err) {
+      console.error("Error fetching users", err);
+      setMessage({ type: "error", text: "Failed to fetch user directory." });
+    } finally {
+      setLoading(false);
     }
-
-    if (editingUser) {
-
-      const updatedUsers = users.map((user) =>
-        user.id === editingUser.id
-          ? {
-              ...user,
-              name: newUser.name,
-              email: newUser.email,
-              role: newUser.role,
-            }
-          : user
-      );
-
-      setUsers(updatedUsers);
-
-      setEditingUser(null);
-
-    } else {
-
-      const user = {
-        id: users.length + 1,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-      };
-
-      setUsers([...users, user]);
-    }
-
-    setNewUser({
-      name: "",
-      email: "",
-      role: "User",
-    });
-
-    setShowModal(false);
   };
 
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(search.toLowerCase())
+  const deleteUser = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to deactivate ${name}?`)) return;
+
+    try {
+      await API.delete(`/users/${id}`);
+      setMessage({ type: "success", text: `User "${name}" deactivated successfully.` });
+      fetchUsers();
+    } catch (err) {
+      console.error("Error deactivating user", err);
+      setMessage({ type: "error", text: "Failed to deactivate user." });
+    }
+  };
+
+  const filteredUsers = users.filter((u) =>
+    (u.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (u.email || "").toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="dashboard-container">
-
+    <div className="dashboard-container" style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <Sidebar />
-
-      <div className="main-content">
-
+      <div className="main-content" style={{ flex: 1, padding: "2rem" }}>
         <Navbar />
 
         <div className="users-page">
+          <div className="users-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+            <div>
+              <h1 style={{ color: "#0f172a", fontSize: "1.8rem", fontWeight: "700" }}>👥 User Management Directory</h1>
+              <p style={{ color: "#64748b" }}>Manage student, faculty, and administrator accounts across all departments.</p>
+            </div>
 
-          <div className="users-header">
-
-            <h1>User Management</h1>
-
-            <button
-              className="add-user-btn"
-              onClick={() => {
-                setEditingUser(null);
-
-                setNewUser({
-                  name: "",
-                  email: "",
-                  role: "User",
-                });
-
-                setShowModal(true);
-              }}
-            >
-              <FaPlus /> Add User
-            </button>
-
+            <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", backgroundColor: "#ffffff", padding: "0.5rem 1rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                <FaFilter style={{ color: "#64748b" }} />
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  style={{ border: "none", background: "none", color: "#334155", fontWeight: "600", cursor: "pointer" }}
+                >
+                  <option value="ALL">All Roles</option>
+                  <option value="ROLE_STUDENT">Students Only</option>
+                  <option value="ROLE_FACULTY">Faculty Only</option>
+                  <option value="ROLE_ADMIN">Admins Only</option>
+                </select>
+              </div>
+            </div>
           </div>
+
+          {message.text && (
+            <div style={{
+              padding: "1rem",
+              borderRadius: "8px",
+              marginBottom: "1.5rem",
+              backgroundColor: message.type === "success" ? "#f0fdf4" : "#fef2f2",
+              color: message.type === "success" ? "#166534" : "#991b1b",
+              border: `1px solid ${message.type === "success" ? "#bbf7d0" : "#fecaca"}`
+            }}>
+              {message.text}
+            </div>
+          )}
 
           <input
             type="text"
-            placeholder="Search User..."
+            placeholder="Search user by name or email..."
             className="search-user"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            style={{ width: "100%", padding: "0.75rem 1rem", borderRadius: "8px", border: "1px solid #cbd5e1", marginBottom: "1.5rem", fontSize: "0.95rem" }}
           />
 
-          <table className="user-table">
-
-            <thead>
-
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Action</th>
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {filteredUsers.map((user) => (
-
-                <tr key={user.id}>
-
-                  <td>{user.id}</td>
-
-                  <td>{user.name}</td>
-
-                  <td>{user.email}</td>
-
-                  <td>{user.role}</td>
-
-                  <td>
-
-                    <button
-                      className="edit-btn"
-                      onClick={() => editUser(user)}
-                    >
-                      <FaEdit />
-                    </button>
-
-                    <button
-                      className="delete-btn"
-                      onClick={() => deleteUser(user.id)}
-                    >
-                      <FaTrash />
-                    </button>
-
-                  </td>
-
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "3rem" }}>Loading active users...</div>
+          ) : (
+            <table className="user-table" style={{ width: "100%", backgroundColor: "#ffffff", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ backgroundColor: "#f1f5f9", textAlign: "left" }}>
+                  <th style={{ padding: "1rem" }}>ID</th>
+                  <th style={{ padding: "1rem" }}>Name</th>
+                  <th style={{ padding: "1rem" }}>Email</th>
+                  <th style={{ padding: "1rem" }}>Department</th>
+                  <th style={{ padding: "1rem" }}>Role</th>
+                  <th style={{ padding: "1rem" }}>Action</th>
                 </tr>
+              </thead>
 
-              ))}
-
-            </tbody>
-
-          </table>
-
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                    <td style={{ padding: "1rem" }}>#{user.id}</td>
+                    <td style={{ padding: "1rem", fontWeight: "600", color: "#0f172a" }}>{user.name}</td>
+                    <td style={{ padding: "1rem", color: "#475569" }}>{user.email}</td>
+                    <td style={{ padding: "1rem", color: "#475569" }}>{user.departmentCode || user.departmentName || "N/A"}</td>
+                    <td style={{ padding: "1rem" }}>
+                      <span style={{
+                        padding: "0.25rem 0.6rem",
+                        borderRadius: "20px",
+                        fontSize: "0.75rem",
+                        fontWeight: "700",
+                        backgroundColor: user.roleName === "ROLE_ADMIN" ? "#fef3c7" : user.roleName === "ROLE_FACULTY" ? "#dbeafe" : "#dcfce7",
+                        color: user.roleName === "ROLE_ADMIN" ? "#92400e" : user.roleName === "ROLE_FACULTY" ? "#1e40af" : "#166534"
+                      }}>
+                        {user.roleName ? user.roleName.replace("ROLE_", "") : "USER"}
+                      </span>
+                    </td>
+                    <td style={{ padding: "1rem" }}>
+                      <button
+                        className="delete-btn"
+                        onClick={() => deleteUser(user.id, user.name)}
+                        title="Deactivate Account"
+                        style={{ backgroundColor: "#ef4444", color: "#fff", border: "none", padding: "0.5rem 0.75rem", borderRadius: "6px", cursor: "pointer" }}
+                      >
+                        <FaTrash /> Deactivate
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
-
       </div>
-
-      {showModal && (
-
-        <div className="modal">
-
-          <div className="modal-content">
-
-            <h2>
-              {editingUser ? "Edit User" : "Add User"}
-            </h2>
-
-            <input
-              type="text"
-              placeholder="Name"
-              value={newUser.name}
-              onChange={(e) =>
-                setNewUser({
-                  ...newUser,
-                  name: e.target.value,
-                })
-              }
-            />
-
-            <input
-              type="email"
-              placeholder="Email"
-              value={newUser.email}
-              onChange={(e) =>
-                setNewUser({
-                  ...newUser,
-                  email: e.target.value,
-                })
-              }
-            />
-
-            <select
-              value={newUser.role}
-              onChange={(e) =>
-                setNewUser({
-                  ...newUser,
-                  role: e.target.value,
-                })
-              }
-            >
-              <option>Admin</option>
-              <option>User</option>
-            </select>
-
-            <div className="modal-buttons">
-
-              <button
-                className="save-btn"
-                onClick={saveUser}
-              >
-                {editingUser ? "Update User" : "Save User"}
-              </button>
-
-              <button
-                className="cancel-btn"
-                onClick={() => {
-                  setShowModal(false);
-                  setEditingUser(null);
-                }}
-              >
-                Cancel
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
     </div>
   );
 }
