@@ -1,5 +1,6 @@
 package com.feedback.feedbacksystem.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -10,6 +11,8 @@ import lombok.*;
 public class FeedbackAssignmentResponseDto {
 
     private Long id;
+
+    @JsonProperty("formId")
     private Long feedbackFormId;
     private String formTitle;
     private String departmentName;

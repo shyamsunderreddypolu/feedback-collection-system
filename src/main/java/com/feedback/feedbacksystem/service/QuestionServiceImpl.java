@@ -33,6 +33,9 @@ public class QuestionServiceImpl implements QuestionService {
     private static final Set<QuestionType> OPTION_BASED =
             EnumSet.of(QuestionType.RADIO, QuestionType.CHECKBOX, QuestionType.DROPDOWN);
 
+    /** A choice question only offers a choice once there are two things to choose between. */
+    private static final int MIN_OPTIONS = 2;
+
     private final QuestionRepository questionRepository;
     private final QuestionOptionRepository questionOptionRepository;
     private final FeedbackFormRepository feedbackFormRepository;
@@ -100,8 +103,9 @@ public class QuestionServiceImpl implements QuestionService {
                 .filter(StringUtils::hasText)
                 .map(String::trim)
                 .toList();
-        if (cleaned.isEmpty()) {
-            throw new BusinessRuleViolationException(type + " questions require at least one option");
+        if (cleaned.size() < MIN_OPTIONS) {
+            throw new BusinessRuleViolationException(
+                    type + " questions require at least " + MIN_OPTIONS + " options");
         }
         return cleaned;
     }
@@ -152,7 +156,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .id(question.getId())
                 .questionText(question.getQuestionText())
                 .questionType(question.getQuestionType())
-                .isMandatory(question.isMandatory())
+                .mandatory(question.isMandatory())
                 .displayOrder(question.getDisplayOrder())
                 .options(options.stream()
                         .map(option -> QuestionOptionResponseDto.builder()

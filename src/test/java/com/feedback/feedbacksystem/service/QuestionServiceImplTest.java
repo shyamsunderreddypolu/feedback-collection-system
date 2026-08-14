@@ -58,7 +58,7 @@ class QuestionServiceImplTest {
                 .feedbackFormId(1L)
                 .questionText("How would you rate the teaching?")
                 .questionType(type)
-                .isMandatory(true)
+                .mandatory(true)
                 .options(options)
                 .build();
     }
@@ -121,7 +121,7 @@ class QuestionServiceImplTest {
 
         assertThatThrownBy(() -> service.addQuestionToForm(request(QuestionType.RADIO, List.of())))
                 .isInstanceOf(BusinessRuleViolationException.class)
-                .hasMessageContaining("require at least one option");
+                .hasMessageContaining("require at least 2 options");
 
         verify(questionRepository, never()).save(any());
     }
@@ -133,7 +133,19 @@ class QuestionServiceImplTest {
 
         assertThatThrownBy(() -> service.addQuestionToForm(request(QuestionType.RADIO, List.of(" ", ""))))
                 .isInstanceOf(BusinessRuleViolationException.class)
-                .hasMessageContaining("require at least one option");
+                .hasMessageContaining("require at least 2 options");
+    }
+
+    @Test
+    @DisplayName("addQuestionToForm rejects a choice question offering only one option")
+    void rejectsRadioWithSingleOption() {
+        stubDraftForm();
+
+        assertThatThrownBy(() -> service.addQuestionToForm(request(QuestionType.RADIO, List.of("Excellent"))))
+                .isInstanceOf(BusinessRuleViolationException.class)
+                .hasMessageContaining("require at least 2 options");
+
+        verify(questionRepository, never()).save(any());
     }
 
     @Test

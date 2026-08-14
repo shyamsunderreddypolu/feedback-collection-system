@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -68,7 +69,11 @@ public class FeedbackFormServiceImpl implements FeedbackFormService {
     @Override
     @Transactional(readOnly = true)
     public List<FeedbackFormResponseDto> getActiveForms() {
-        return feedbackFormRepository.findByStatus(FormStatus.ACTIVE).stream()
+        // Active means both published and inside its response window, otherwise forms whose
+        // end date has passed would still be offered to students.
+        LocalDateTime now = LocalDateTime.now();
+        return feedbackFormRepository
+                .findByStatusAndStartDateBeforeAndEndDateAfter(FormStatus.ACTIVE, now, now).stream()
                 .filter(form -> !form.isDeleted())
                 .map(this::toResponseDto)
                 .toList();
