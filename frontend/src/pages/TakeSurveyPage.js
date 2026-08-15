@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import API from "../api/axiosInstance";
@@ -16,11 +16,7 @@ function TakeSurveyPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
-  useEffect(() => {
-    fetchSurveyDetails();
-  }, [formId]);
-
-  const fetchSurveyDetails = async () => {
+  const fetchSurveyDetails = useCallback(async () => {
     try {
       setLoading(true);
       const formRes = await API.get(`/forms/${formId}`);
@@ -34,7 +30,11 @@ function TakeSurveyPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formId]);
+
+  useEffect(() => {
+    fetchSurveyDetails();
+  }, [fetchSurveyDetails]);
 
   const handleRatingChange = (questionId, rating) => {
     setAnswers((prev) => ({

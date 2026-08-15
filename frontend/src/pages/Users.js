@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import API from "../api/axiosInstance";
 import "../css/Users.css";
-import { FaPlus, FaTrash, FaUserShield, FaUserGraduate, FaChalkboardTeacher, FaFilter } from "react-icons/fa";
+import { FaTrash, FaFilter } from "react-icons/fa";
 
 function Users() {
   const [users, setUsers] = useState([]);
@@ -12,11 +12,7 @@ function Users() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ type: "", text: "" });
 
-  useEffect(() => {
-    fetchUsers();
-  }, [roleFilter]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const url = roleFilter === "ALL" ? "/users/active" : `/users/role/${roleFilter}`;
@@ -28,7 +24,11 @@ function Users() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [roleFilter]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const deleteUser = async (id, name) => {
     if (!window.confirm(`Are you sure you want to deactivate ${name}?`)) return;
