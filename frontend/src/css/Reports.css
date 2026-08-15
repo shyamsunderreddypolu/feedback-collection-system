@@ -1,0 +1,114 @@
+.reports-page{
+    padding:25px;
+}
+
+.reports-page h1{
+    color:#222;
+    font-size:34px;
+}
+
+.reports-page p{
+    color:#666;
+    margin-bottom:25px;
+}
+
+.report-cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+.report-card{
+    background:#fff;
+    border-radius:12px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+.report-card:hover{
+    transform:translateY(-5px);
+}
+
+.card-icon{
+    font-size:38px;
+    color:#2563eb;
+    margin-bottom:15px;
+}
+
+.report-card h2{
+    color:#2563eb;
+    margin-bottom:10px;
+}
+
+.report-card p{
+    margin:0;
+    color:#555;
+}
+
+.chart-box{
+    background:white;
+    margin-top:35px;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.chart-box h2{
+    margin-bottom:20px;
+}
+
+.export-buttons{
+    display:flex;
+    gap:20px;
+    margin-top:30px;
+}
+
+.export-buttons button{
+    padding:12px 25px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    color:white;
+    font-size:16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.pdf-btn{
+    background:#dc2626;
+}
+
+.pdf-btn:hover{
+    background:#b91c1c;
+}
+
+.excel-btn{
+    background:#16a34a;
+}
+
+.excel-btn:hover{
+    background:#15803d;
+}
+
+@media(max-width:992px){
+
+.report-cards{
+    grid-template-columns:repeat(2,1fr);
+}
+
+}
+
+@media(max-width:768px){
+
+.report-cards{
+    grid-template-columns:1fr;
+}
+
+.export-buttons{
+    flex-direction:column;
+}
+
+}
