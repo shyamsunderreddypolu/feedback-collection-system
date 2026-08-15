@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import API from "../api/axiosInstance";
@@ -12,11 +12,7 @@ function FacultyDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchFacultyAnalytics();
-  }, [user]);
-
-  const fetchFacultyAnalytics = async () => {
+  const fetchFacultyAnalytics = useCallback(async () => {
     try {
       setLoading(true);
       const facultyId = user?.id || 1;
@@ -28,7 +24,11 @@ function FacultyDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchFacultyAnalytics();
+  }, [fetchFacultyAnalytics]);
 
   return (
     <div className="dashboard-container" style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8fafc" }}>

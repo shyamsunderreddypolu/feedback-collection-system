@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
-  FaCommentDots,
   FaUsers,
   FaChartBar,
   FaCog,

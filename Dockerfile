@@ -15,7 +15,7 @@ RUN ./mvnw dependency:go-offline -B || true
 
 # Copy source code and build the JAR
 COPY src ./src
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -Dmaven.test.skip=true
 
 # Stage 2: Minimal Runtime Image
 FROM eclipse-temurin:17-jre-jammy
