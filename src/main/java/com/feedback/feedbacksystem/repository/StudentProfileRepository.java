@@ -10,13 +10,13 @@ import java.util.Optional;
 @Repository
 public interface StudentProfileRepository extends JpaRepository<StudentProfile, Long> {
 
+    Optional<StudentProfile> findByUserId(Long userId);
+
     Optional<StudentProfile> findByRollNumber(String rollNumber);
 
-    boolean existsByRollNumber(String rollNumber);
+    long countByUserDepartmentIdAndSemesterAndBatch(Long departmentId, int semester, String batch);
 
-    List<StudentProfile> findByYearAndSemesterAndSection(int year, int semester, String section);
+    long countByUserDepartmentIdAndSemesterAndSectionAndBatch(Long departmentId, int semester, String section, String batch);
 
-    List<StudentProfile> findByBatch(String batch);
-
-    Optional<StudentProfile> findByUserId(Long userId);
+    List<StudentProfile> findByUserDepartmentIdAndSemesterAndBatch(Long departmentId, int semester, String batch);
 }

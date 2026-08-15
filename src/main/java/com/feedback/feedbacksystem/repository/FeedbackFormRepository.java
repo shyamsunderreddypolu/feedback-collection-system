@@ -11,12 +11,11 @@ import java.util.List;
 @Repository
 public interface FeedbackFormRepository extends JpaRepository<FeedbackForm, Long> {
 
-    List<FeedbackForm> findByStatus(FormStatus status);
+    List<FeedbackForm> findByStatusAndIsDeletedFalse(FormStatus status);
 
-    List<FeedbackForm> findByCreatorId(Long creatorId);
+    List<FeedbackForm> findByCreatorIdAndIsDeletedFalse(Long creatorId);
 
     List<FeedbackForm> findByIsDeletedFalse();
 
-    List<FeedbackForm> findByStatusAndStartDateBeforeAndEndDateAfter(
-            FormStatus status, LocalDateTime start, LocalDateTime end);
+    List<FeedbackForm> findByStatusAndStartDateBeforeAndEndDateAfter(FormStatus status, LocalDateTime now1, LocalDateTime now2);
 }

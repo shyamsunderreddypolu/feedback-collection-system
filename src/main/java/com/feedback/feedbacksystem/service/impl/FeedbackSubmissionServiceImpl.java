@@ -118,10 +118,12 @@ public class FeedbackSubmissionServiceImpl implements FeedbackSubmissionService 
     public boolean hasStudentSubmittedForAssignment(Long assignmentId, Long studentId) {
         Long formId = feedbackAssignmentRepository.findById(assignmentId)
                 .map(fa -> fa.getFeedbackForm().getId())
-                .orElseGet(() -> courseAssignmentRepository.findById(assignmentId)
-                        .flatMap(ca -> feedbackAssignmentRepository.findByCourseId(ca.getCourse().getId()).stream().findFirst())
-                        .map(fa -> fa.getFeedbackForm().getId())
-                        .orElse(assignmentId));
+                .orElseGet(() -> {
+                    List<FeedbackAssignment> assignments = courseAssignmentRepository.findById(assignmentId)
+                            .map(ca -> feedbackAssignmentRepository.findByCourseId(ca.getCourse().getId()))
+                            .orElse(List.of());
+                    return assignments.isEmpty() ? assignmentId : assignments.get(0).getFeedbackForm().getId();
+                });
 
         return responseRepository.existsByFeedbackFormIdAndSubmitterId(formId, studentId);
     }

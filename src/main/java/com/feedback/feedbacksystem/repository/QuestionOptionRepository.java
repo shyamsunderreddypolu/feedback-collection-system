@@ -11,5 +11,5 @@ public interface QuestionOptionRepository extends JpaRepository<QuestionOption, 
 
     List<QuestionOption> findByQuestionIdOrderByDisplayOrderAsc(Long questionId);
 
-    List<QuestionOption> findByQuestionIdAndIsActiveTrue(Long questionId);
+    List<QuestionOption> findByQuestionIdAndIsActiveTrueOrderByDisplayOrderAsc(Long questionId);
 }
