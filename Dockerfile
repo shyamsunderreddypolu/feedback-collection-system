@@ -7,8 +7,11 @@ WORKDIR /app
 COPY pom.xml mvnw ./
 COPY .mvn .mvn
 
-# Make mvnw executable and download dependencies
-RUN chmod +x ./mvnw && ./mvnw dependency:go-offline -B
+# Fix potential Windows CRLF line endings on mvnw and make executable
+RUN sed -i 's/\r$//' ./mvnw && chmod +x ./mvnw
+
+# Download dependencies (offline cache)
+RUN ./mvnw dependency:go-offline -B || true
 
 # Copy source code and build the JAR
 COPY src ./src
