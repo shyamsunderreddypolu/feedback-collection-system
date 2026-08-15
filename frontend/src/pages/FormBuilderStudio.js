@@ -2,30 +2,25 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import API from "../api/axiosInstance";
-import { FaPlus, FaWpforms, FaPaperPlane, FaBulltarget, FaTrash, FaCheck } from "react-icons/fa";
 import "../css/AdminDashboard.css";
 
 function FormBuilderStudio() {
-  const [forms, setForms] = useState([]);
   const [activeForm, setActiveForm] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   // Form Creation State
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
   // Question Creation State
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("RATING");
-  const [mandatory, setMandatory] = useState(true);
   const [questions, setQuestions] = useState([]);
 
   // Assignment Modal State
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [departmentCode, setDepartmentCode] = useState("CSE");
-  const [academicYear, setAcademicYear] = useState("2025-2026");
+  const [academicYear] = useState("2025-2026");
   const [semester, setSemester] = useState(5);
   const [section, setSection] = useState("A");
 
@@ -37,13 +32,9 @@ function FormBuilderStudio() {
 
   const fetchForms = async () => {
     try {
-      setLoading(true);
-      const response = await API.get("/forms/active");
-      setForms(response.data || []);
+      await API.get("/forms/active");
     } catch (err) {
       console.error("Error loading forms", err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -54,7 +45,7 @@ function FormBuilderStudio() {
       const response = await API.post("/forms", {
         title,
         description,
-        startDate: startDate ? new Date(startDate).toISOString() : new Date().toISOString(),
+        startDate: new Date().toISOString(),
         endDate: endDate ? new Date(endDate).toISOString() : new Date(Date.now() + 7 * 86400000).toISOString()
       });
 
@@ -77,7 +68,7 @@ function FormBuilderStudio() {
         questionText,
         questionType,
         displayOrder: questions.length + 1,
-        mandatory
+        mandatory: true
       });
 
       setQuestions([...questions, response.data]);
