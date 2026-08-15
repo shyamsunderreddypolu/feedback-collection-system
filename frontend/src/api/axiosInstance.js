@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Dynamically use REACT_APP_API_BASE_URL in production (e.g. Railway URL), fallback to local backend
-const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
+// Default to the live Railway Cloud backend URL, or use environment variable if provided
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'https://feedback-collection-system-production.up.railway.app/api';
 
 const API = axios.create({
   baseURL: baseURL,
