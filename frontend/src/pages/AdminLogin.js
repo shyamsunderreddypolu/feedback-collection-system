@@ -29,14 +29,27 @@ function AdminLogin() {
     try {
       setLoading(true);
       setError("");
-      const response = await API.post("/auth/login", { email, password });
+      const response = await API.post("/auth/login", { 
+        email: email.trim(), 
+        password: password.trim() 
+      });
       
-      const { token, id, name, userEmail, role } = response.data;
-      login({ id, name, email: userEmail, role }, token);
+      const { token, userId, id, name, email: userEmail, role } = response.data;
+      const resolvedId = userId || id;
+      const resolvedEmail = userEmail || email;
+
+      login({ id: resolvedId, name, email: resolvedEmail, role }, token);
       
-      navigate("/dashboard");
+      if (role === "ROLE_STUDENT") {
+        navigate("/student-surveys");
+      } else if (role === "ROLE_FACULTY") {
+        navigate("/faculty-analytics");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+      console.error("Login failed", err);
+      setError(err.response?.data?.message || "Invalid credentials. Please check your email and password.");
     } finally {
       setLoading(false);
     }
@@ -74,9 +87,9 @@ function AdminLogin() {
               <FaLock />
             </div>
 
-            <h2>Admin Login</h2>
+            <h2>User Login</h2>
 
-            <p>Welcome back! Please Login to continue</p>
+            <p>Sign in with your Admin, Faculty, or Student credentials</p>
           </div>
 
           {error && <div className="error-message" style={{ color: "#ef4444", marginBottom: "1rem", fontSize: "0.9rem", textAlign: "center" }}>{error}</div>}
@@ -94,7 +107,7 @@ function AdminLogin() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter admin email"
+                  placeholder="e.g. admin@fbcs.local"
                   required
                 />
               </div>
@@ -124,11 +137,9 @@ function AdminLogin() {
             {/* Remember */}
             <div className="remember-forgot">
               <label className="remember">
-                <input type="checkbox" />
+                <input type="checkbox" defaultChecked />
                 <span>Remember Me</span>
               </label>
-
-              <a href="/">Forgot Password?</a>
             </div>
 
             {/* Login Button */}
