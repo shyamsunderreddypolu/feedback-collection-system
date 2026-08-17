@@ -12,57 +12,118 @@
 
 ---
 
-## 📸 Screenshots & Visual Previews
+## 📸 Application Screenshots
 
-### 🏛️ System Architecture
-![System Architecture](screenshots/system_architecture.png)
+### 🔐 Unified Authentication Portal
+![Unified Login Portal](screenshots/01_login_page.png)
 
-### 📊 Admin Analytics & Management Dashboard
-![Admin Dashboard](screenshots/admin_dashboard.png)
+### 📊 Administrator Executive Dashboard
+![Admin Dashboard](screenshots/02_admin_dashboard.png)
 
-### 🗄️ Relational Entity-Relationship (ER) Diagram
-![ER Diagram](screenshots/er_diagram.png)
+### 🛠️ Survey Form Builder Studio
+![Form Builder Studio](screenshots/03_form_builder.png)
 
----
+### 👥 User Directory & Role Management
+![User Management Directory](screenshots/04_user_management.png)
 
-## 🌟 Key Features
+### 📈 Reports & PDF/CSV Export Portal
+![Reports Export Portal](screenshots/05_reports_export.png)
 
-### 👨‍💼 Administrator Portal
-- **Form Builder Studio**: Create dynamic survey forms with 5-star ratings, single-choice options, checkboxes, and long-form text questions.
-- **Academic Audience Targeting**: Target specific academic cohorts by Department (`CSE`, `ECE`, `MECH`), Semester, and Section.
-- **Form Publishing**: Transition draft forms to active status with automatic validation.
-- **User Management**: Filter and manage Student, Faculty, and Admin accounts with soft-deactivation.
-- **Export Engine**: Stream single-click executive **PDF summary reports** and raw **CSV dataset exports**.
+### 👨‍🏫 Faculty Course Feedback Analytics
+![Faculty Course Analytics](screenshots/06_faculty_analytics.png)
 
-### 👨‍🏫 Faculty Portal
-- **Course Feedback Analytics**: Real-time aggregation of student evaluation scores (e.g. `4.65 / 5.0`).
-- **Response Metrics**: Live submission counts, participation rate percentage, and sentiment trends.
-- **Anonymized Student Feedback**: Read qualitative student comments while preserving complete student anonymity.
-
-### 👨‍🎓 Student Portal
-- **Active Surveys Hub**: Immediate view of feedback forms assigned to the student's cohort.
-- **Interactive Form Completion**: Intuitive star ratings, radio selectors, and feedback input.
-- **Anonymity & Privacy**: Submissions are anonymized in faculty views.
-- **Duplicate Protection**: Automatic duplicate response rejection.
+### 👨‍🎓 Student Active Surveys & Evaluation Portal
+![Student Survey Portal](screenshots/07_student_portal.png)
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## 🏛️ System Architecture
 
-| Layer | Technologies Used |
-| :--- | :--- |
-| **Frontend** | React 18, React Router v6, Axios, Chart.js, React-Icons, CSS3 |
-| **Backend** | Java 17, Spring Boot 3.5.x, Spring Data JPA, Spring Security 6 |
-| **Authentication** | Stateless JWT (HMAC-SHA256), BCrypt Password Encryption (`$2a$10$...`) |
-| **Database** | MySQL 8.x (15 Relational Tables with Foreign Key Cascades & Soft-Deletes) |
-| **Reporting** | OpenPDF / iText (PDF Generation), OpenCSV (CSV Export) |
-| **Container & Cloud** | Multi-Stage Dockerfile, Railway (Backend & MySQL), Vercel (Frontend SPA) |
+```mermaid
+graph TD
+    subgraph Client ["Client Layer (React 18 / Vercel)"]
+        A1[👨‍🎓 Student Portal]
+        A2[👨‍🏫 Faculty Analytics]
+        A3[👨‍💼 Admin Studio]
+    end
+
+    subgraph Security ["Security Layer (Spring Security 6)"]
+        B1[JwtAuthenticationFilter]
+        B2[Role-Based Authorization]
+        B3[BCrypt Password Encoder]
+    end
+
+    subgraph Backend ["Service Layer (Spring Boot 3 / Railway)"]
+        C1[Auth & Profile Service]
+        C2[Survey & Question Engine]
+        C3[Submission & Validation Service]
+        C4[Analytics & Aggregation Engine]
+        C5[iText PDF & CSV Export Engine]
+    end
+
+    subgraph Storage ["Database Layer (MySQL 8 / Railway)"]
+        D1[(users, roles, departments)]
+        D2[(feedback_forms, questions, options)]
+        D3[(responses, answers)]
+        D4[(assignments, courses)]
+    end
+
+    Client -->|HTTPS + Bearer JWT| Security
+    Security --> Backend
+    Backend --> Storage
+```
+
+---
+
+## 🗄️ Database Schema & Relationships
+
+```mermaid
+erDiagram
+    USERS ||--o{ STUDENT_PROFILES : has
+    USERS ||--o{ FACULTY_PROFILES : has
+    USERS }o--|| ROLES : assigned
+    USERS }o--|| DEPARTMENTS : belongs_to
+
+    FEEDBACK_FORMS ||--o{ QUESTIONS : contains
+    QUESTIONS ||--o{ QUESTION_OPTIONS : has
+    FEEDBACK_FORMS ||--o{ FEEDBACK_ASSIGNMENTS : targeted_to
+    FEEDBACK_FORMS ||--o{ RESPONSES : receives
+
+    RESPONSES ||--o{ ANSWERS : includes
+    QUESTIONS ||--o{ ANSWERS : answered_in
+    COURSES ||--o{ COURSE_ASSIGNMENTS : assigned_to
+```
+
+---
+
+## 🌟 Key Role Capabilities
+
+| Role | Target Portal | Core Permissions & Functionality |
+| :--- | :--- | :--- |
+| **👨‍💼 Administrator** | `/dashboard`<br>`/form-builder`<br>`/users`<br>`/reports` | • Build dynamic forms with Star Ratings, Radio options, Checkboxes, and Text questions.<br>• Target academic cohorts by Department (`CSE`, `ECE`, `MECH`), Semester, and Section.<br>• Publish draft forms to active status.<br>• Manage user directory with role filtering and soft-deactivation.<br>• One-click export of executive PDF summary reports and CSV datasets. |
+| **👨‍🏫 Faculty Member** | `/faculty-analytics` | • Real-time course feedback rating score (e.g. `4.65 / 5.0`).<br>• Response volume and participation rate analytics.<br>• Review qualitative student comments with guaranteed student anonymity. |
+| **👨‍🎓 Student** | `/student-surveys`<br>`/take-survey/:id` | • Access surveys assigned to student's department and semester.<br>• Submit anonymous evaluations with interactive 5-star ratings and feedback.<br>• Automatic prevention of duplicate submissions. |
+
+---
+
+## 🏗️ Technology Stack Breakdown
+
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Frontend UI** | React 18 SPA | Built with React Router v6, Axios, and React Icons. |
+| **State Management** | Context API (`AuthContext`) | Manages JWT token lifecycle, session persistence, and role state. |
+| **Data Visualization** | Chart.js & `react-chartjs-2` | Interactive feedback analytics charts and response trends. |
+| **Backend REST API** | Spring Boot 3.5.x | Java 17 enterprise REST architecture with Spring Data JPA. |
+| **Security & Auth** | Spring Security 6 & JWT | Stateless HMAC-SHA256 tokens and BCrypt (`$2a$10$...`) hashing. |
+| **Relational Database** | MySQL 8.x | 15 relational tables with foreign keys and soft-deletions. |
+| **Reporting Engine** | OpenPDF / iText & OpenCSV | Real-time binary PDF streaming and formatted CSV export. |
+| **Cloud Hosting** | Railway & Vercel | Multi-stage Docker container on Railway + Single Page App on Vercel. |
 
 ---
 
 ## 🔑 Default Demo Accounts
 
-The application automatically seeds the following accounts on first startup:
+The system automatically seeds initial accounts on first startup:
 
 | Role | Email | Password | Accessible Portals |
 | :--- | :--- | :--- | :--- |
@@ -88,15 +149,10 @@ The application automatically seeds the following accounts on first startup:
 git clone https://github.com/shyamsunderreddypolu/feedback-collection-system.git
 cd feedback-collection-system
 
-# Configure MySQL in src/main/resources/application.properties
-# spring.datasource.url=jdbc:mysql://localhost:3306/fbcs_db?createDatabaseIfNotExist=true
-# spring.datasource.username=root
-# spring.datasource.password=your_password
-
-# Run the Spring Boot application
+# Run Spring Boot backend
 ./mvnw spring-boot:run
 ```
-> The backend will start on **`http://localhost:8080`**.
+> Backend starts on **`http://localhost:8080`**.
 
 ---
 
@@ -109,23 +165,23 @@ cd frontend
 # Install dependencies
 npm install
 
-# Start the React development server
+# Start React development server
 npm start
 ```
-> The frontend will launch on **`http://localhost:3000`**.
+> Frontend launches on **`http://localhost:3000`**.
 
 ---
 
-## 🌐 Production Deployment
+## 🌐 Production Cloud Deployment
 
 ### 1. Backend on Railway
-1. Create a **MySQL** database service on [Railway](https://railway.app/).
-2. Create a new service from your GitHub repository using the included multi-stage `Dockerfile`.
-3. The application automatically binds to Railway's MySQL environment variables (`MYSQLHOST`, `MYSQLPORT`, `MYSQLDATABASE`, `MYSQLUSER`, `MYSQLPASSWORD`) and dynamic `${PORT}`.
+1. Provision a **MySQL** database on [Railway](https://railway.app/).
+2. Deploy the Spring Boot application using the included multi-stage `Dockerfile`.
+3. Railway automatically binds database connection variables (`MYSQLHOST`, `MYSQLPORT`, `MYSQLDATABASE`, `MYSQLUSER`, `MYSQLPASSWORD`) and dynamic `${PORT}`.
 
 ### 2. Frontend on Vercel
 1. Import the repository on [Vercel](https://vercel.com/) with root directory set to `frontend/`.
-2. Add the environment variable:
+2. Add environment variable:
    - `REACT_APP_API_BASE_URL` = `https://<your-railway-backend-url>/api`
 3. Click **Deploy**.
 
@@ -134,15 +190,15 @@ npm start
 ## 📡 REST API Reference
 
 ### 🔐 Authentication
-- `POST /api/auth/login` - Authenticate user & issue JWT token
+- `POST /api/auth/login` - Authenticate credentials and issue JWT token
 - `POST /api/auth/register` - Register a new user account
 
 ### 📝 Survey Forms & Questions
-- `GET /api/forms/active` - Fetch all active surveys for current user
-- `POST /api/forms` - Create draft feedback form *(Admin only)*
-- `PUT /api/forms/{id}/publish` - Publish feedback form *(Admin only)*
-- `POST /api/questions` - Add dynamic question item *(Admin only)*
-- `POST /api/assignments` - Assign form to academic cohort *(Admin only)*
+- `GET /api/forms/active` - Fetch active surveys for logged-in user
+- `POST /api/forms` - Create draft feedback form *(Admin)*
+- `PUT /api/forms/{id}/publish` - Publish feedback form *(Admin)*
+- `POST /api/questions` - Add dynamic question item *(Admin)*
+- `POST /api/assignments` - Assign form to academic cohort *(Admin)*
 
 ### ✍️ Submissions & Analytics
 - `POST /api/submissions` - Submit survey response *(Student)*
@@ -151,21 +207,21 @@ npm start
 - `GET /api/reports/export/csv` - Download CSV Dataset *(Admin)*
 
 ### 👥 User Management
-- `GET /api/users/active` - List all active system users
+- `GET /api/users/active` - List all active users
 - `GET /api/users/role/{role}` - Filter users by role (`ROLE_STUDENT`, `ROLE_FACULTY`, `ROLE_ADMIN`)
 - `DELETE /api/users/{id}` - Soft-deactivate a user account
 
 ---
 
-## 🧪 Testing & Quality Verification
+## 🧪 Testing & Verification
 
 ```bash
-# Run backend test suite (134 automated unit and integration tests)
+# Run full automated test suite
 ./mvnw test
 ```
 
-- **Backend Unit & Integration Tests**: `134 / 134 PASSED (100%)`
-- **End-to-End Workflow Validation**: Full 11-step manual QA verification passed.
+- **Automated Tests**: **`134 / 134 PASSED (100%)`** across Controllers, Services, Security, and DTOs.
+- **End-to-End Manual QA**: Complete 11-step verification flow tested and validated.
 
 ---
 
